@@ -9,16 +9,17 @@ from gensim.corpora import Dictionary
 import numpy as np
 from datetime import datetime
 
+
 def now():
-	return datetime.now().time()
+    return datetime.now().time()
 
 partie = [
-    glob('partie\\KO/*'),
-    glob('partie\\Konfederacja/*'),
-    glob('partie\\Lewica/*'),
-    glob('partie\\niez/*'),
-    glob('partie\\PiS/*'),
-    glob('partie\\PSL-Kukiz15/*')
+    'KO',
+    'Konfederacja',
+    'Lewica',
+    'niez',
+    'PiS',
+    'PSL-Kukiz15'
 ]
 
 stopwords = open("polish.stopwords.txt", encoding='utf-8').read().splitlines()
@@ -26,9 +27,8 @@ stopwords = open("polish.stopwords.txt", encoding='utf-8').read().splitlines()
 documents = []
 
 for p in partie:
-    partia = p[0].split('\\')[1]
     wypowiedzi_partii = ''
-    for posl in p:
+    for posl in glob('partie\\' + p + '/*'):
         wypowiedzi = glob(posl + '/*')
         with fileinput.input(wypowiedzi, openhook=fileinput.hook_encoded("windows-1250")) as wyp:
             for line in wyp:
@@ -45,24 +45,31 @@ np.seterr(divide='ignore', invalid='ignore')
 
 dictionary = Dictionary(documents)
 tfidf = TfidfModel(dictionary=dictionary)
-model = KeyedVectors.load("word2vec_100_3_polish.bin")
+wv = KeyedVectors.load("word2vec_100_3_polish.bin")
 
 print(now(), 'loaded model')
 
-similarity_index = WordEmbeddingSimilarityIndex(model)
+similarity_index = WordEmbeddingSimilarityIndex(wv)
 similarity_matrix = SparseTermSimilarityMatrix(
-    similarity_index, dictionary, tfidf)
+    similarity_index, dictionary)
 print(now(), 'created similarity matrix')
 
-index = SoftCosineSimilarity(tfidf[[dictionary.doc2bow(
-    document) for document in documents]], similarity_matrix)
-print(now(), 'created index')
+index = SoftCosineSimilarity([dictionary.doc2bow(
+    document) for document in documents], similarity_matrix)
 
+print(now(), 'created index')
+# index.save('soft_cosine.index')
+
+# index = SoftCosineSimilarity.load('soft_cosine.index')
 while True:
     try:
         query = input("Query: ").lower().split()
-        query = tfidf[dictionary.doc2bow(query)]
-        similarities = index[query]
-        print(now, similarities)
+        # query = tfidf[dictionary.doc2bow(query)]
+        similarities = index[dictionary.doc2bow(query)]
+        result_list = [partie[i] for i in [a[0] for a in similarities]]
+        score_list = [a[1] for a in similarities]
+        results = [' '.join(each) for each in result_list]
+        for score, result in zip(score_list, results):
+            print('{:.3f} : {}'.format(score, result))
     except Exception as e:
         print(e)
