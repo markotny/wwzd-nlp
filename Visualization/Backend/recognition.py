@@ -7,6 +7,7 @@ from gensim.models import KeyedVectors, WordEmbeddingSimilarityIndex, TfidfModel
 from gensim.similarities import MatrixSimilarity, SparseTermSimilarityMatrix, SoftCosineSimilarity
 from gensim.corpora import Dictionary
 import numpy as np
+import os.path
 np.seterr(divide='ignore', invalid='ignore')
 
 def get_stopwords():
@@ -31,12 +32,11 @@ def load_parties(stopwords, documents, tags, partie):
                     [word for word in wyp_text.lower().split() if word not in stopwords])
 
 def prepare_index(dictionary, wv, tfidf, documents):
-    similarity_index = WordEmbeddingSimilarityIndex(wv)
-    similarity_matrix = SparseTermSimilarityMatrix(similarity_index, dictionary, tfidf)
-
-    index = SoftCosineSimilarity(tfidf[[dictionary.doc2bow(document) for document in documents]], similarity_matrix)
-
-    index.save('soft_cosine.index')
+    if not os.path.isfile('soft_cosine.index'):
+        similarity_index = WordEmbeddingSimilarityIndex(wv)
+        similarity_matrix = SparseTermSimilarityMatrix(similarity_index, dictionary, tfidf)
+        index = SoftCosineSimilarity(tfidf[[dictionary.doc2bow(document) for document in documents]], similarity_matrix)
+        index.save('soft_cosine.index')
 
     return SoftCosineSimilarity.load('soft_cosine.index')
 
@@ -69,7 +69,9 @@ def recognize(query):
         query = tfidf[bow[0]]
         print("Słowa nierozpoznane: ", bow[1])
         similarities = index[query]
+        response = []
         for score, wyp in sorted(zip(similarities, tags), key= lambda t: t[0], reverse=True)[:20]:
-            print('{:.3f} : {}'.format(score, wyp))
+            response.append('{:.3f} : {}'.format(score, wyp))
+        return response
     except Exception as e:
         print(e)

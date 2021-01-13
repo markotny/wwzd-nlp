@@ -1,0 +1,14 @@
+{
+    "env": {
+        "name": "DEV",
+        "production": "false",
+        "platform": "web"
+    },
+    "baseUrl": "http://localhost:105",
+    "httpOptions": {
+        "getRetryCount": 0,
+        "postRetryCount": 0,
+        "deleteRetryCount": 0,
+        "updateRetryCount": 0
+    }
+}

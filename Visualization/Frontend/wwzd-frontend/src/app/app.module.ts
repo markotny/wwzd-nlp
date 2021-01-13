@@ -1,8 +1,15 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { ChartModule } from 'primeng/chart';
+import { HttpClientModule } from '@angular/common/http';
+import { AppConfig } from './app.config';
+
+export function initializeApp(appConfig: AppConfig) {
+  return () => appConfig.load();
+}
 
 @NgModule({
   declarations: [
@@ -10,7 +17,9 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ChartModule,
+    HttpClientModule 
   ],
   providers: [],
   bootstrap: [AppComponent]
