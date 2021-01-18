@@ -2,8 +2,11 @@ from flask import Flask
 from flask import current_app, flash, jsonify, make_response
 from enum import Enum
 from random import randint
+import recognition
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 class Party(Enum):
     KO = 1
@@ -38,8 +41,8 @@ def error_response():
 
 @app.route('/check_party_affiliation', methods=['POST', 'GET'])
 def check_party_affiliation():
-    temp = randint(1, 6)
-    obj = {"response": str(Party(temp))}
+    result = recognition.recognize('Musimy stworzyć więcej żłobków'.lower().split())
+    obj = { 'response': result }
     return make_my_response(obj)
 
 if __name__ == '__main__':
