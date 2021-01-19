@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { PersonResultModel } from './core/models/person-result.model';
+import { QueryModel } from './core/models/query-model';
 import { ResponseModel } from './core/models/response.model';
 import { VisualizationHttpService } from './core/services/http/visualization-http.service';
 
@@ -10,35 +12,61 @@ import { VisualizationHttpService } from './core/services/http/visualization-htt
 export class AppComponent implements OnInit {
   title = 'wwzd-frontend';
   data: any;
+  people: Array<PersonResultModel>;
+  query: string;
 
-  constructor(private http: VisualizationHttpService<ResponseModel>) {}
+  constructor(private http: VisualizationHttpService<ResponseModel, QueryModel>) {}
 
   ngOnInit() {
-    const response = this.http.get('check_party_affiliation');
-    response.subscribe(
-      (response) => {
-        console.log(response);
-      }
-    );
+    this.query = '';
+  }
 
+  private createPersons(response: Array<string>) {
+    const people = Array<PersonResultModel>();
 
+    for(const text of response) {
+      const temp = text.split(':');
+      let person = new PersonResultModel();
+      person.probability = Number(temp[0]) * 100;
+      person.party = temp[1].trim();
+      person.name = temp[2].trim();
+      person.speech = temp[3].trim();
+      people.push(person);
+    }
+    return people
+  }
+
+  private createData() {
+    const labels = Array<string>();
+    const data = Array<number>();
+    for(const person of this.people) {
+      labels.push(person.name + ' ' + `(${person.party})`)
+      data.push(person.probability);
+    }
     this.data = {
-      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+      labels: labels,
       datasets: [
           {
-              label: 'My First dataset',
-              backgroundColor: '#42A5F5',
-              borderColor: '#1E88E5',
-              data: [65, 59, 80, 81, 56, 55, 40]
-          },
-          {
-              label: 'My Second dataset',
-              backgroundColor: '#9CCC65',
-              borderColor: '#7CB342',
-              data: [28, 48, 40, 19, 86, 27, 90]
+            label: 'Prawdopodobieństwo wypowiedzi',
+            backgroundColor: '#42A5F5',
+            borderColor: '#1E88E5',
+            data: data
           }
       ]
     }
+  }
+
+  makeRequest() {
+    const queryModel = new QueryModel();
+    queryModel.query = this.query;
+    const response = this.http.post('check_party_affiliation', queryModel);
+    response.subscribe(
+      (response) => {
+        this.people = this.createPersons(response.response);
+        console.log(this.people);
+        this.createData();
+      }
+    );
   }
 }
 

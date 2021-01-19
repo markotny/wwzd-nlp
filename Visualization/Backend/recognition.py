@@ -8,6 +8,7 @@ from gensim.similarities import MatrixSimilarity, SparseTermSimilarityMatrix, So
 from gensim.corpora import Dictionary
 import numpy as np
 import os.path
+
 np.seterr(divide='ignore', invalid='ignore')
 
 def get_stopwords():
@@ -31,9 +32,9 @@ def load_parties(stopwords, documents, tags, partie):
                 documents.append(
                     [word for word in wyp_text.lower().split() if word not in stopwords])
 
-def prepare_index(dictionary, wv, tfidf, documents):
+def prepare_index(dictionary, model, tfidf, documents):
     if not os.path.isfile('soft_cosine.index'):
-        similarity_index = WordEmbeddingSimilarityIndex(wv)
+        similarity_index = WordEmbeddingSimilarityIndex(model.wv)
         similarity_matrix = SparseTermSimilarityMatrix(similarity_index, dictionary, tfidf)
         index = SoftCosineSimilarity(tfidf[[dictionary.doc2bow(document) for document in documents]], similarity_matrix)
         index.save('soft_cosine.index')
@@ -57,11 +58,11 @@ def recognize(query):
 
     load_parties(stopwords, documents, tags, partie)
 
-    wv = KeyedVectors.load("word2vec_100_3_polish.bin")
+    model = KeyedVectors.load("fasttext_100_3_polish.bin")
     dictionary = Dictionary(documents)
     tfidf = TfidfModel(dictionary=dictionary)
 
-    index = prepare_index(dictionary, wv, tfidf, documents)
+    index = prepare_index(dictionary, model, tfidf, documents)
 
     try:
         # query = "".lower().split()

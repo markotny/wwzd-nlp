@@ -1,5 +1,6 @@
 venv/
 partie/
 polish.stopwords.txt
-word2vec_100_3_polish.bin
-word2vec_100_3_polish.bin.syn0.npy
+fasttext_100_3_polish.bin*
+__pycache__
+.vscode

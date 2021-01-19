@@ -6,6 +6,9 @@ import { AppComponent } from './app.component';
 import { ChartModule } from 'primeng/chart';
 import { HttpClientModule } from '@angular/common/http';
 import { AppConfig } from './app.config';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -19,7 +22,10 @@ export function initializeApp(appConfig: AppConfig) {
     BrowserModule,
     AppRoutingModule,
     ChartModule,
-    HttpClientModule 
+    HttpClientModule,
+    InputTextModule,
+    ButtonModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

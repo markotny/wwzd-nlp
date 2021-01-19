@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import current_app, flash, jsonify, make_response
+from flask import current_app, flash, jsonify, make_response, request
 from enum import Enum
 from random import randint
 import recognition
@@ -41,7 +41,8 @@ def error_response():
 
 @app.route('/check_party_affiliation', methods=['POST', 'GET'])
 def check_party_affiliation():
-    result = recognition.recognize('Musimy stworzyć więcej żłobków'.lower().split())
+    json_obj = request.get_json(force=True)
+    result = recognition.recognize(json_obj['query'].lower().split())
     obj = { 'response': result }
     return make_my_response(obj)
 

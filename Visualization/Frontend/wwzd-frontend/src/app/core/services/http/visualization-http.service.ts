@@ -7,7 +7,7 @@ import { AppConfig } from 'src/app/app.config';
 @Injectable({
     providedIn: 'root'
 })
-export class VisualizationHttpService<T> {
+export class VisualizationHttpService<T, V> {
   constructor(protected httpClient: HttpClient) { }
   baseRoute = 'http://localhost:105';
 
@@ -21,7 +21,7 @@ export class VisualizationHttpService<T> {
       );
   }
 
-  public post(endpoint: any, model: T, headers?: HttpHeaders): Observable<T> {
+  public post(endpoint: any, model: V, headers?: HttpHeaders): Observable<T> {
     return this.httpClient
       .post<T>(this.baseRoute + '/' + endpoint, model, { headers })
       .pipe(

@@ -1,0 +1,17 @@
+// @import '../../node_modules/primeng/resources/themes/bootstrap4-light-blue/theme.css';
+// @import '../../node_modules/primeng/resources/primeng.min.css';
+
+.main-container {
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+input {
+    width: 60%;
+}
